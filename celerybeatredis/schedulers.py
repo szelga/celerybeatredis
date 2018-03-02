@@ -255,8 +255,9 @@ class RedisScheduler(Scheduler):
         # In case we have a preconfigured schedule
         self.update_from_dict(self.app.conf.CELERYBEAT_SCHEDULE)
         for name in self.app.conf.CELERYBEAT_SCHEDULE:
-            if not self.rdb.get(name):
-                self.rdb.set(name, self.schedule[name].jsondump())
+            _name = current_app.conf.CELERY_REDIS_SCHEDULER_KEY_PREFIX + name
+            if not self.rdb.get(_name):
+                self.rdb.set(_name, self.schedule[name].jsondump())
 
     def tick(self):
         """Run a tick, that is one iteration of the scheduler.
